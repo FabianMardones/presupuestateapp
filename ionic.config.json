@@ -1,0 +1,7 @@
+{
+  "name": "app-cotizaciones",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
