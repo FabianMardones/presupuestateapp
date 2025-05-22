@@ -19,7 +19,7 @@ import { environment } from './environments/environment.prod';
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    provideIonicAngular(),
+    provideIonicAngular({innerHTMLTemplatesEnabled: true}),
     provideRouter(routes, withPreloading(PreloadAllModules)),
 
     //FIREBASE

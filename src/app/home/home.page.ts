@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonIcon } from '@ionic/angular/standalone';
+import { FirestoreService } from '../firebase/firestore.service';
 
 @Component({
   selector: 'app-home',
@@ -9,6 +10,23 @@ import { IonHeader, IonToolbar, IonTitle, IonContent, IonIcon } from '@ionic/ang
 })
 export class HomePage {
 
+  private fireStoreService: FirestoreService = inject(FirestoreService);
   
-  constructor() {}
+  constructor() {
+    this.test()
+    this.testLectura()
+  }
+
+  async test(){
+    console.log('test()');
+    
+    await this.fireStoreService.createDocument('test', {hola: 'nada'})
+  }
+
+  testLectura(){
+    this.fireStoreService.getDocumentsChanges('test').subscribe(res => {
+      console.log('testLectura ->', res);
+      
+    })
+  }
 }
