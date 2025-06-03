@@ -7,7 +7,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content fullscreen="true">
+<ion-content fullscreen="true" class="login">
 
   <ion-header collapse="condense">
     <ion-toolbar>
@@ -19,7 +19,7 @@
     @if (!enableLoginWithEmailAndPassword) {
 
 
-      <ion-grid fixed class="content-center">
+      <ion-grid fixed class="content-center providers">
         @for (provider of providers; track $index) {
             <ion-row class="ion-justify-content-center">
               <ion-col size="10" size-md="6" size-lg="4">

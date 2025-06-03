@@ -17,10 +17,10 @@ import { InteractionService } from '../../../services/interaction.service';
   styleUrls: ['./perfil.component.scss'],
   standalone: false
 })
-export class PerfilComponent  implements OnInit {
+export class PerfilComponent implements OnInit {
 
   authenticationService: AuthenticationService = inject(AuthenticationService);
-  firestoreService:   FirestoreService = inject(  FirestoreService);
+  firestoreService: FirestoreService = inject(FirestoreService);
   userService: UserService = inject(UserService);
   storageService: StorageService = inject(StorageService);
 
@@ -32,20 +32,20 @@ export class PerfilComponent  implements OnInit {
   iniciando: boolean = true;
 
   formNewEmail = this.fb.group({
-    email: ['', [Validators.required, Validators.email]], 
+    email: ['', [Validators.required, Validators.email]],
   });
 
   isSame = (input: FormControl) => {
     console.log('input -> ', input.value);
     if (this.formCambiarPassword?.value?.newPassword != input?.value) {
-        return {notSame: true}
-    }  
+      return { notSame: true }
+    }
     return {};
   }
 
   formCambiarPassword = this.fb.group({
     newPassword: ['', [Validators.required, Validators.minLength(6)]], // Validators.pattern(Models.Auth.StrongPasswordRegx) 
-    repetPassword: ['', [Validators.required, this.isSame]], 
+    repetPassword: ['', [Validators.required, this.isSame]],
   });
 
 
@@ -58,66 +58,80 @@ export class PerfilComponent  implements OnInit {
 
 
   constructor(private fb: FormBuilder,
-              private router: Router,
-              private interactionService: InteractionService) {
-                
+    private router: Router,
+    private interactionService: InteractionService) {
+
     this.iniciando = true;
     this.user = this.authenticationService.getCurrentUser()
     this.getDatosProfile(this.user.uid);
 
-  
+
   }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
 
   ionViewDidEnter() {
     const user = this.authenticationService.getCurrentUser();
     console.log('ionViewDidEnter login -> ', user);
-     if (user) {
-        this.user = user
-     }
+    if (user) {
+      this.user = user
+    }
   }
+
+
+
+    //-----------------------------------------------------------------------------------------------------------------------
+
+
 
   salir() {
     this.authenticationService.logout();
   }
 
   async actualizarPerfil() {
-      let data: Models.Auth.UpdateProfileI = {};  
-      if (this.newName) {
-        data.displayName = this.newName;
-      }
-      if (data.displayName) {
-        this.modalEditInfo.isOpen = false;
-        await this.interactionService.showLoading('Actualizando...')
-        await this.authenticationService.updateProfile(data);
-        const user = this.authenticationService.getCurrentUser();
-        const updateData: any = {
-          name: user.displayName,
-          photo: user.photoURL
-        };
-        await this.firestoreService.updateDocument(`${Models.Auth.PathUsers}/${user.uid}`, updateData);
-        this.interactionService.dismissLoading();
-        this.interactionService.showToast('Actualizado con éxito')
-        this.user = user;
-        this.newName = null;
-        this.newPhoto = null;
-      }
+    let data: Models.Auth.UpdateProfileI = {};
+    if (this.newName) {
+      data.displayName = this.newName;
+    }
+    if (data.displayName) {
+      this.modalEditInfo.isOpen = false;
+      await this.interactionService.showLoading('Actualizando...')
+      await this.authenticationService.updateProfile(data);
+      const user = this.authenticationService.getCurrentUser();
+      const updateData: any = {
+        name: user.displayName,
+        photo: user.photoURL
+      };
+      await this.firestoreService.updateDocument(`${Models.Auth.PathUsers}/${user.uid}`, updateData);
+      this.interactionService.dismissLoading();
+      this.interactionService.showToast('Actualizado con éxito')
+      this.user = user;
+      this.newName = null;
+      this.newPhoto = null;
+    }
 
   }
+
+
+
+  //-----------------------------------------------------------------------------------------------------------------------
 
 
   async getDatosProfile(uid: string) {
     console.log('getDatosProfile -> ', uid);
-    this.firestoreService.getDocumentChanges<Models.Auth.UserProfile>(`${Models.Auth.PathUsers}/${uid}`).subscribe( res => {
-        if (res) {  
-          this.userProfile = res;
-          console.log('this.userProfile -> ', this.userProfile);
-        }
-        this.iniciando = false;
+    this.firestoreService.getDocumentChanges<Models.Auth.UserProfile>(`${Models.Auth.PathUsers}/${uid}`).subscribe(res => {
+      if (res) {
+        this.userProfile = res;
+        console.log('this.userProfile -> ', this.userProfile);
+      }
+      this.iniciando = false;
     });
   }
+
+
+  //-----------------------------------------------------------------------------------------------------------------------
+
 
   async actualizarEdad() {
     const user = this.authenticationService.getCurrentUser();
@@ -131,6 +145,12 @@ export class PerfilComponent  implements OnInit {
     this.interactionService.showToast('Actualizado con éxito');
   }
 
+
+
+  //-----------------------------------------------------------------------------------------------------------------------
+
+
+
   async actualizarEmail() {
     if (this.formNewEmail.valid) {
       const data = this.formNewEmail.value;
@@ -139,43 +159,57 @@ export class PerfilComponent  implements OnInit {
         await this.interactionService.showLoading('Enviando enlace de verificación...')
         await this.authenticationService.verifyBeforeUpdateEmail(data.email);
         this.interactionService.dismissLoading();
-        await this.interactionService.presentAlert('Importante', 
-              `Te hemos enviado un correo a <strong>${data.email}</strong> para que puedas verificar tu nuevo correo, 
+        await this.interactionService.presentAlert('Importante',
+          `Te hemos enviado un correo a <strong>${data.email}</strong> para que puedas verificar tu nuevo correo, 
               verifícalo e inicia sesión con el nuevo correo, caso contrario inicia sesión con tu correo de siempre`);
         await this.authenticationService.logout(false);
         this.modalEditInfo.isOpen = false;
         setTimeout(() => {
-                this.router.navigate(['/user/login']);
+          this.router.navigate(['/user/login']);
         }, 200);
       } catch (error) {
         console.log('error al actualizar el correo -> ', error);
         this.interactionService.dismissLoading();
         this.modalEditInfo.isOpen = false;
-        const response = await this.interactionService.presentAlert('Error', 
-        `Para realizar esta acción debes haber realizado un inicio de sesión reciente.
+        const response = await this.interactionService.presentAlert('Error',
+          `Para realizar esta acción debes haber realizado un inicio de sesión reciente.
         ¿Deseas cerrar sesión y volver a ingresar para realizar esta acción?`,
-      'Cancelar');
+          'Cancelar');
         if (response) {
           await this.authenticationService.logout(false);
           setTimeout(() => {
-            this.router.navigate(['/user/login'], {replaceUrl: true});
+            this.router.navigate(['/user/login'], { replaceUrl: true });
           }, 200);
         }
       }
     }
   }
 
+
+
+    //-----------------------------------------------------------------------------------------------------------------------
+
+
+
   async enviarCorreo() {
     this.interactionService.showLoading('Enviando correo...');
     await this.authenticationService.sendEmailVerification();
     this.interactionService.dismissLoading();
-    await this.interactionService.presentAlert('Importante', 
+    await this.interactionService.presentAlert('Importante',
       `Te hemos enviado un enlace de verificación a tu correo`);
     console.log('correo enviado -> comprueba tu correo',);
   }
 
+
+
+
+    //-----------------------------------------------------------------------------------------------------------------------
+
+
+
+
   async cambiarPassword() {
-    console.log('this.formCambiarPassword -> ', this.formCambiarPassword); 
+    console.log('this.formCambiarPassword -> ', this.formCambiarPassword);
     if (this.formCambiarPassword.valid) {
       const data = this.formCambiarPassword.value;
       console.log('valid -> ', data);
@@ -189,9 +223,9 @@ export class PerfilComponent  implements OnInit {
       } catch (error) {
         console.log('error al cambiar la contraseña -> ', error);
         this.interactionService.dismissLoading();
-        const responseAlert = await this.interactionService.presentAlert('Error', 
+        const responseAlert = await this.interactionService.presentAlert('Error',
           `Para establacer una nueva contraseña debes cerrar tu sesión e ingresar nuevamente, <strong>¿Deseas cerrar tu sesión?</strong>`,
-        'Cancelar');
+          'Cancelar');
         if (responseAlert) {
           await this.authenticationService.logout(false);
           setTimeout(() => {
@@ -203,9 +237,15 @@ export class PerfilComponent  implements OnInit {
     }
   }
 
+
+
+    //-----------------------------------------------------------------------------------------------------------------------
+
+
+
   async eliminarCuenta() {
     // preguntar al usuario si está seguro de eliminar la cuenta
-    const responseAlert = await this.interactionService.presentAlert('Importante', 
+    const responseAlert = await this.interactionService.presentAlert('Importante',
       `Seguro que deseas eliminar tu cuenta, <strong>esta acción no se puede revertir</strong>`,
       'Cancelar');
     if (responseAlert) {
@@ -223,27 +263,37 @@ export class PerfilComponent  implements OnInit {
         await this.interactionService.dismissLoading();
         await this.authenticationService.logout();
         this.router.navigate(['/user/login'])
-        
+
       } catch (error) {
         console.log('error al eliminar la cuenta -> ', error);
         this.interactionService.dismissLoading();
-        const responseAlert = await this.interactionService.presentAlert('Error', 
+        const responseAlert = await this.interactionService.presentAlert('Error',
           `Para eliminar tu cuenta debes cerrar tu sesión e ingresar nuevamente, <strong>¿Deseas cerrar tu sesión?</strong>`,
-        'Cancelar');
+          'Cancelar');
         if (responseAlert) {
           await this.authenticationService.logout(false);
           setTimeout(() => {
-            this.router.navigate(['/user/login'], {replaceUrl: true})
+            this.router.navigate(['/user/login'], { replaceUrl: true })
           }, 200);
         }
       }
     }
   }
 
+
+
+  //-----------------------------------------------------------------------------------------------------------------------
+
+
+
   async downloadProfilePicture() {
     await this.storageService.downloadFile(this.userProfile.photo);
     console.log('imagen descargada con éxito');
   }
+
+
+  //-----------------------------------------------------------------------------------------------------------------------
+
 
   async editarProfilePicture() {
     console.log('subiendo...');
@@ -251,24 +301,31 @@ export class PerfilComponent  implements OnInit {
     const folder = `PhotosPerfil/${this.user.uid}`;
     const name = this.newImage.name;
     const snapshot = await this.storageService.uploadFile(folder, name, this.newImage)
-    await this.authenticationService.updateProfile({photoURL: snapshot.ref.fullPath});
+    await this.authenticationService.updateProfile({ photoURL: snapshot.ref.fullPath });
     const updateDoc: any = {
       photo: snapshot.ref.fullPath
     }
     await this.firestoreService.updateDocument(`${Models.Auth.PathUsers}/${this.user.uid}`, updateDoc);
-    this.user = this.authenticationService.getCurrentUser(); 
+    this.user = this.authenticationService.getCurrentUser();
     this.interactionService.dismissLoading();
     this.interactionService.showToast('Actualizado con éxito')
     this.newImage = null;
     this.modalEditInfo.isOpen = false;
   }
 
+
+    //-----------------------------------------------------------------------------------------------------------------------
+
+
   async viewPreview(input: HTMLInputElement) {
     if (input.files.length) {
-        const files = input.files;
-        this.newImage = files.item(0);
+      const files = input.files;
+      this.newImage = files.item(0);
     }
   }
+
+
+  //-----------------------------------------------------------------------------------------------------------------------
 
 
   selectOpcModal(opc: 'email' | 'photo' | 'name' | 'password') {

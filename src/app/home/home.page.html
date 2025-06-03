@@ -1,7 +1,7 @@
-<ion-header [translucent]="true">
+<ion-header [translucent]="true" id="home">
   <ion-toolbar>
     <ion-title>
-      Hola Mundo
+      Liderman
     </ion-title>
   </ion-toolbar>
 </ion-header>
@@ -16,8 +16,12 @@
   <div id="container">
     <ion-icon name="home"></ion-icon>
     <ion-icon name="alarm"></ion-icon>
+    <ion-button [routerLink]="['/user/login']">
+      Login
+    </ion-button>
     <br>
     <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer"
+        href="https://ionicframework.com/docs/components">UI Components</a></p>
   </div>
 </ion-content>

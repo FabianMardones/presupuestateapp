@@ -9,7 +9,7 @@ import { InteractionService } from '../../../services/interaction.service';
   styleUrls: ['./user-detail.component.scss'],
   standalone: false
 })
-export class UserDetailComponent  implements OnInit {
+export class UserDetailComponent implements OnInit {
 
   @Input() user: Models.Auth.UserProfile;
   //private functionsService: FunctionsService = inject(FunctionsService);
@@ -19,13 +19,13 @@ export class UserDetailComponent  implements OnInit {
   constructor(private interactionService: InteractionService) { }
 
   ngOnInit() {
-      this.initRoles()
+    this.initRoles()
   }
 
   initRoles() {
     for (const key in this.user.roles) {
-       const rol: any = key
-       this.rolesSelect.push(rol)
+      const rol: any = key
+      this.rolesSelect.push(rol)
     }
     console.log('this.rolesSelect -> ', this.rolesSelect);
   }
@@ -34,10 +34,10 @@ export class UserDetailComponent  implements OnInit {
     console.log('changeRol -> ', ev.detail.value);
     await this.interactionService.showLoading('Actualizando...')
     const roles: any = {};
-    this.rolesSelect.forEach( rol => {
-          roles[rol] = true 
+    this.rolesSelect.forEach(rol => {
+      roles[rol] = true
     });
-    const updateDoc = { 
+    const updateDoc = {
       roles
     }
     console.log('updateDoc roles -> ', updateDoc);
@@ -54,9 +54,9 @@ export class UserDetailComponent  implements OnInit {
       this.interactionService.dismissLoading();
       this.interactionService.presentAlert('Error', 'No se pudo actualizar el rol del usuario');
       console.log('changeRol error -> ', error);
-      
+
     }
-    
+
   }
 
 }

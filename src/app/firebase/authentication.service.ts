@@ -159,9 +159,6 @@ export class AuthenticationService {
   getRedirectResult() {
     return getRedirectResult(this.auth) 
   }
-
-
-
 }
 
 
