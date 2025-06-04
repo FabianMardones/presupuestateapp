@@ -1,31 +1,37 @@
+import { enableProdMode, importProvidersFrom } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { RouteReuseStrategy, provideRouter, withPreloading, PreloadAllModules } from '@angular/router';
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalone';
 
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
-import { Capacitor } from '@capacitor/core';
+import { environment } from './environments/environment';
 
 
-//Firebase
+// firebase
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
-import { getFirestore, initializeFirestore, persistentLocalCache, provideFirestore} from '@angular/fire/firestore';
+import { getFirestore, initializeFirestore, persistentLocalCache, provideFirestore } from '@angular/fire/firestore';
 import { getAuth, indexedDBLocalPersistence, initializeAuth, provideAuth } from '@angular/fire/auth';
 import { getFunctions, provideFunctions } from '@angular/fire/functions';
 import { getStorage, provideStorage } from '@angular/fire/storage';
 import { ScreenTrackingService, getAnalytics, provideAnalytics, UserTrackingService } from '@angular/fire/analytics';
-import { environment } from './environments/environment.prod';
+import { Capacitor } from '@capacitor/core';
+import { IonicStorageModule } from '@ionic/storage-angular';
+
+if (environment.production) {
+  enableProdMode();
+}
 
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    provideIonicAngular({innerHTMLTemplatesEnabled: true}),
+    provideIonicAngular({ innerHTMLTemplatesEnabled: true }),
     provideRouter(routes, withPreloading(PreloadAllModules)),
 
     //FIREBASE
-    provideFirebaseApp(()=> {
+    provideFirebaseApp(() => {
       const app = initializeApp(environment.firebaseConfig);
-      if(Capacitor.isNativePlatform()){
+      if (Capacitor.isNativePlatform()) {
         initializeFirestore(app, {
           localCache: persistentLocalCache(),
         });
@@ -42,5 +48,6 @@ bootstrapApplication(AppComponent, {
     provideAnalytics(() => getAnalytics()),
     ScreenTrackingService,
     UserTrackingService,
+    importProvidersFrom(IonicStorageModule.forRoot())
   ],
 });

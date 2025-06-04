@@ -126,8 +126,6 @@ export class LoginComponent implements OnInit {
       await this.interactionService.showLoading('Ingresando...')
       try {
         const response = await this.authenticationService.login(data.email, data.password);
-        console.log('¡Login de Firebase Auth EXITOSO en deploy! UID:', response.user.uid);
-        
         this.interactionService.dismissLoading();
         const user = response.user;
         this.interactionService.showToast(`Bienvenido ${user.displayName}`)
@@ -136,7 +134,6 @@ export class LoginComponent implements OnInit {
         }, 500);
       } catch (error) {
         console.log('login error -> ', error);
-        console.error('Login de Firebase Auth FALLÓ en deploy:', error);
         this.interactionService.dismissLoading();
         this.interactionService.presentAlert('Error', 'Credenciales inválidas')
       }

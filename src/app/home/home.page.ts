@@ -13,22 +13,8 @@ import { RouterModule } from '@angular/router';
 export class HomePage {
 
   private fireStoreService: FirestoreService = inject(FirestoreService);
-  
+
   constructor() {
-    this.test()
-    this.testLectura()
-  }
 
-  async test(){
-    console.log('test()');
-    
-    await this.fireStoreService.createDocument('test', {hola: 'nada'})
-  }
-
-  testLectura(){
-    this.fireStoreService.getDocumentsChanges('test').subscribe(res => {
-      console.log('testLectura ->', res);
-      
-    })
   }
 }
